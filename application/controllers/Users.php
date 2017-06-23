@@ -8,6 +8,9 @@
 
     public function index($param){
       header('Content-Type: application/json');
+      if($this->input->method(true) == 'POST'){
+        return $this->create($_POST);
+      }
       if($param=='index'){  // This is what it's empty looks like by default
         $data = $this->readAll();
         echo json_encode($data);
@@ -21,8 +24,12 @@
       }
     }
 
-    private function create($value=''){
-      # code...
+    private function create($data){
+      return database_query(
+        "INSERT INTO
+        `users` (`username`, `password`, `email`)
+        VALUES (?,?,?)",
+        "sss", [$data['username'], $data['password'], $data['email']]);
     }
 
     private function readAll(){
