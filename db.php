@@ -51,6 +51,22 @@
     }
   }
 
+  /*
+   * Queries the database, returning an associative array or false, based on
+   * the query's results. The query must have no arguments (i.e. useful for
+   * retrieving all values from a table).
+   */
+  function database_no_args_query($query) {
+    $connection = database_connect();
+    $result = mysqli_query($connection, $query);
+
+    if($result === false)
+      return false;
+    while ($row = mysqli_fetch_assoc($result))
+      $rows[] = $row;
+    return $rows;
+  }
+
   function database_error() {
     $connection = db_connect();
     return mysqli_connect_error($connection);

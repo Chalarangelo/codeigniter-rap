@@ -7,66 +7,47 @@
     }
 
     public function index($param){
-      //echo 'Hello world';
-      //$r = $this->read('1337');
-      $r = database_query("SELECT user_id, username FROM users WHERE user_id=? AND username=?", "ss", ["1337","dummy"]);
-      // if ($r === false)
-      //   { echo 'nope'; return;}
       header('Content-Type: application/json');
-      echo json_encode($r[0]);
-      //echo $r[0];
+      if($param=='index'){  // This is what it's empty looks like by default
+        $data = $this->readAll();
+        echo json_encode($data);
+      }
+      else {
+        $data = $this->read($param);
+        if($data == false)
+          echo(json_encode(array('message'=>'No user with this username.')));
+        else
+          echo json_encode($data[0]);
+      }
     }
 
-    private function create($value='')
-    {
+    private function create($value=''){
       # code...
     }
 
-    private function read($value="1337")
-    {
-      $connection = database_connect();
-      // $d = "dummy";
-      // $v = array("1137","dummy");
-      // $refs = array();
-      //   foreach($v as $key => $value)
-      //       $refs[$key] = &$v[$key];
-      // $type ="ss";
-      $query = mysqli_prepare($connection, "SELECT user_id, username FROM users WHERE user_id=? AND username=?");
-      //mysqli_stmt_bind_param($query,"ss", $v);
-      call_user_func_array("mysqli_stmt_bind_param",array($query,"ss","1337","dummy"));
-      // call_user_func_array(array($query,"bind_param"),$refs);
-      mysqli_stmt_execute($query);
-      $result = mysqli_stmt_get_result($query);
-      //mysqli_stmt_bind_result($query, $table);
-      $rows = array();
-
-      if ($result === false)
-        return false;
-      while ($row = mysqli_fetch_assoc($result)){
-        $rows[] = $row;
-        // printf("%s %s\n", $row['user_id'],$row['username']);
-      }
-      /*
-      // if (mysqli_stmt_num_rows($query) == 0)  return false;
-
-      //while ($row = mysqli_fetch_assoc($result))
-      //  $rows[] = $row;
-
-      while (mysqli_stmt_fetch($query)) {
-        $rows[] = array('id' => $table['user_id'], 'username' => $table['username']);
-        printf("%s %s\n",  $table['user_id'],  $table['username']);
-      }
-      */
-      return $rows;
+    private function readAll(){
+      return database_no_args_query(
+        "SELECT username, user_id AS id
+        FROM users"
+      );
     }
 
-    private function update($value='')
-    {
+    private function read($username){
+      if(empty($username))
+        return array("message"=>"The specified username was empty.");
+      return database_query(
+        "SELECT username, user_id AS id
+        FROM users
+        WHERE username=?",
+        "s", [$username]
+      );
+    }
+
+    private function update($value=''){
       # code...
     }
 
-    private function delete($value='')
-    {
+    private function delete($value=''){
       # code...
     }
 
