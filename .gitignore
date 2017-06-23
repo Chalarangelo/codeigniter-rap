@@ -18,3 +18,5 @@ application/logs/*
 
 #user-defined (download CodeIgniter and include it on your own)
 system
+
+\.htaccess

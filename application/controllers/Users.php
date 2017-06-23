@@ -1,5 +1,6 @@
 <?php
   require __DIR__.'/../../db.php';
+  require __DIR__.'/../../jwt.php';
   class Users extends CI_Controller {
 
     public function _remap($param){
@@ -7,13 +8,18 @@
     }
 
     public function index($param){
-      header('Content-Type: application/json');
+      //echo password_hash(hash('sha512', '1234',true),PASSWORD_DEFAULT),"\n";
+      $token = array();
+      $token['id'] = '1337';
+      //echo JWT::encode($token, 'my_key', 'HS512'),"\n";
+      //header('Content-Type: application/json');
       if($this->input->method(true) == 'POST'){
-        return $this->create($_POST);
+        echo json_encode($this->create($_POST));
+        return;
       }
       if($param=='index'){  // This is what it's empty looks like by default
         $data = $this->readAll();
-        echo json_encode($data);
+        echo $data;
       }
       else {
         $data = $this->read($param);
@@ -29,7 +35,7 @@
         "INSERT INTO
         `users` (`username`, `password`, `email`)
         VALUES (?,?,?)",
-        "sss", [$data['username'], $data['password'], $data['email']]);
+        "sss", [$data['username'], $data['password'], $data['email']], true);
     }
 
     private function readAll(){

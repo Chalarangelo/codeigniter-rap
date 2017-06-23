@@ -31,8 +31,11 @@
    *  $params - An array of values that will be passed as parameters to the
    *    query. The types of the parameters must match the types specified by
    *    $types.
+   *  $is_insert - (Optional) If set to true, the execution of the prepared
+   *    statement will return the newly inserted id instead of a set of rows.
+   *    Should only be used for actual INSERT statements.
    */
-  function database_query($query, $types, $params){
+  function database_query($query, $types, $params, $is_insert = false){
     $connection = database_connect();
     $statement = mysqli_prepare($connection, $query);
     $refs = array();
@@ -40,14 +43,19 @@
       $refs[$key] = &$params[$key];
     call_user_func_array("mysqli_stmt_bind_param",array_merge(array($statement, $types),$refs));
     mysqli_stmt_execute($statement);
-    $result = mysqli_stmt_get_result($statement);
-    $rows = array();
+    if ($is_insert) {
+      $result = mysqli_stmt_insert_id($statement);
+      return array("id"=>$result);
+    }
+    else {
+      $result = mysqli_stmt_get_result($statement);
+      $rows = array();
 
-    if ($result === false)
-      return false;
-    while ($row = mysqli_fetch_assoc($result)){
-      $rows[] = $row;
-    return $rows;
+      if ($result === false)
+        return false;
+      while ($row = mysqli_fetch_assoc($result))
+        $rows[] = $row;
+      return $rows;
     }
   }
 
@@ -55,6 +63,8 @@
    * Queries the database, returning an associative array or false, based on
    * the query's results. The query must have no arguments (i.e. useful for
    * retrieving all values from a table).
+   * Parameters:
+   *  $query - The query to the database, as a string.
    */
   function database_no_args_query($query) {
     $connection = database_connect();
