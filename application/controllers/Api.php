@@ -5,8 +5,10 @@ class Api extends CI_Controller {
 
   public function __construct(){
     parent::__construct();
+    $this->load->helper('error_code');
     $this->load->helper('database');
     $this->load->helper('jwt');
+    $this->load->helper('request');
     $this->load->helper('auth');
     $this->load->helper('rest_api');
     $this->users = array(
@@ -14,7 +16,10 @@ class Api extends CI_Controller {
       "create_fields" => ["`username`", "`password`", "`email`"],
       "create_types" => "sss",
       "read_fields" => "`username`, `user_id` AS `id`",
-      "read_key" => "`username`"
+      "read_key" => "`username`",
+      "update_fields" => ["`email`"],
+      "update_key" => "`username`",
+      "delete_key" => "`username`"
     );
     $this->auth = array(
       "table" => "`users`",
@@ -49,14 +54,15 @@ class Api extends CI_Controller {
   }
 
   /**
-   * Method for getting `user` resources.
+   * Method for accessing `user` resources.
    * Parameters:
    * @param $param - (Optional) The parameter used to uniquely identify the
-   *  specific resource. If nothing is specified, all 'user' resoures will be
-   *  listed.
+   *  specific resource. If nothing is specified, the root resource will be
+   *  set as the target.
    */
   public function users($param=''){
     header('Content-Type: application/json');
+    // Create - POST
     if($this->input->method(true) == 'POST'){
       echo json_encode(createResourceElement(
         $this->users["table"], $this->users["create_fields"], $this->users["create_types"],
@@ -66,19 +72,62 @@ class Api extends CI_Controller {
       ));
       return;
     }
+    // Update - PUT
     if($this->input->method(true) == 'PUT'){
-      echo json_encode(updateResourceElement(
-        $this->users["table"], ["password","email"], "ss", ["$2y$10\$cRnaeK79/TOcaAeFLmEuB.BdBIn1FYfNdq1dPkdJ1CuqOJcheUH0O", "dummy@gmail.com"], $this->users["read_key"], "dummy"
+      if(check_jwt_cookie($this->auth["service_name"], $this->auth["cookie_name"])){
+        $jwt = get_jwt_data($this->auth["cookie_name"]);
+        $_PUT = get_request_body();
+        if(isset($jwt["username"]) && $jwt["username"] == $_PUT["username"]) {
+          echo json_encode(updateResourceElement(
+            $this->users["table"], $this->users["update_fields"], "s",
+            [$_PUT["email"]], $this->users["update_key"], $_PUT["username"]
+          ));
+          return;
+        }
+        echo json_encode(array(
+          "code" => BAD_CREDENTIALS,
+          "message" => "Token does not match the provided credentials."
+        ));
+        return;
+      }
+      echo json_encode(array(
+        "code" => NO_COOKIE,
+        "message" => "Token not found or invalid."
       ));
+      return;
     }
+    // Delete - DELETE
+    if($this->input->method(true) == 'DELETE'){
+      if(check_jwt_cookie($this->auth["service_name"], $this->auth["cookie_name"])){
+        $jwt = get_jwt_data($this->auth["cookie_name"]);
+        $_DELETE = get_request_body();
+        if(isset($jwt["username"]) && $jwt["username"] == $_DELETE["username"]) {
+          echo json_encode(deleteResourceElement(
+            $this->users["table"], $this->users["delete_key"], $_DELETE["username"]
+          ));
+          return;
+        }
+        echo json_encode(array(
+          "code" => BAD_CREDENTIALS,
+          "message" => "Token does not match the provided credentials."
+        ));
+        return;
+      }
+      echo json_encode(array(
+        "code" => NO_COOKIE,
+        "message" => "Token not found or invalid."
+      ));
+      return;
+    }
+    // Read - GET
     if($param == ''){
       echo json_encode(readResourceRoot( $this->users["table"], $this->users["read_fields"]));
       return;
     }
     else{
       $data = readResourceElement(
-          $this->users["table"], $this->users["read_fields"], $this->users["read_key"],
-          $param
+        $this->users["table"], $this->users["read_fields"], $this->users["read_key"],
+        $param
       );
       if($data == false)
         echo(json_encode(array('message'=>'No user with this username.')));

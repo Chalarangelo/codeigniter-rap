@@ -1,7 +1,8 @@
 <?php
 /**
  * Restful API helper, implementing generic CRUD methods.
- * The helper relies heavily upon the Database helper provided with it.
+ * The helper relies heavily upon the Database and Error Code helpers
+ * provided with it.
  * ---------------------------------------------------------------------
  */
 
@@ -10,7 +11,11 @@
  * @return a JSON object with an error message
  */
 function createResourceRoot(){
-  return array("message"=>"Creating a new resource collection is prohibited.");
+  $ci =& get_instance(); $ci->load->helper('error_code');
+  return array(
+    "code" => PROHIBITED,
+    "message"=>"Creating a new resource collection is prohibited."
+  );
 }
 
 /**
@@ -23,13 +28,16 @@ function createResourceRoot(){
  * @return the id of the newly-created collection member
  */
 function createResourceElement($table, $input_fields, $input_types, $input_values){
-  // Load the database helper for querying
-  $ci =& get_instance(); $ci->load->helper('database');
+  // Load the appropriate helpers
+  $ci =& get_instance(); $ci->load->helper('database'); $ci->load->helper('error_code');
   $input_fields_count = count($input_fields);
   $input_values_count = count($input_fields);
 
   if ($input_fields_count != $input_values_count)
-    return array("message"=>"The number of values provided does not match the number of fields.");
+    return array(
+      "code" => BAD_DATA,
+      "message"=>"The number of values provided does not match the number of fields."
+    );
 
   $input_fields_squashed = implode(",", $input_fields);
   $input_fields_questionmarks = implode(",",array_fill(0,$input_values_count,"?"));
@@ -48,7 +56,7 @@ function createResourceElement($table, $input_fields, $input_types, $input_value
  * @return a collection of elements
  */
 function readResourceRoot($table, $fields){
-  // Load the database helper for querying
+  // Load the appropriate helpers
   $ci =& get_instance(); $ci->load->helper('database');
   return database_no_args_query(
     "SELECT ".$fields." FROM ".$table
@@ -66,7 +74,7 @@ function readResourceRoot($table, $fields){
  * @return a list of members or false
  */
 function readResourceElement($table, $fields, $element_key, $key_value){
-  // Load the database helper for querying
+  // Load the appropriate helpers
   $ci =& get_instance(); $ci->load->helper('database');
   return database_query(
     "SELECT ".$fields." FROM ".$table." WHERE ".$element_key."=?",
@@ -79,7 +87,12 @@ function readResourceElement($table, $fields, $element_key, $key_value){
  * @return a JSON object with an error message
  */
 function updateResourceRoot(){
-  return array("message"=>"Updating a resource collection is prohibited.");
+  // Load the appropriate helpers
+  $ci =& get_instance(); $ci->load->helper('error_code');
+  return array(
+    "code" => PROHIBITED,
+    "message"=>"Updating a resource collection is prohibited."
+  );
 }
 
 /**
@@ -96,13 +109,16 @@ function updateResourceRoot(){
  * @return the number of affected rows
  */
 function updateResourceElement($table, $input_fields, $input_types, $input_values, $element_key, $key_value){
-  // Load the database helper for querying
-  $ci =& get_instance(); $ci->load->helper('database');
+  // Load the appropriate helpers
+  $ci =& get_instance(); $ci->load->helper('database'); $ci->load->helper('error_code');
   $input_fields_count = count($input_fields);
   $input_values_count = count($input_fields);
 
   if ($input_fields_count != $input_values_count)
-    return array("message"=>"The number of values provided does not match the number of fields.");
+  return array(
+    "code" => BAD_DATA,
+    "message"=>"The number of values provided does not match the number of fields."
+  );
 
   $input_fields_squashed = implode("=?, ", $input_fields)."=?";
   $input_values[] = $key_value;
@@ -119,7 +135,12 @@ function updateResourceElement($table, $input_fields, $input_types, $input_value
  * @return a JSON object with an error message
  */
 function deleteResourceRoot(){
-  return array("message"=>"Deleting a resource collection is prohibited.");
+  // Load the appropriate helpers
+  $ci =& get_instance(); $ci->load->helper('error_code');
+  return array(
+    "code" => PROHIBITED,
+    "message"=>"Deleting a resource collection is prohibited."
+  );
 }
 
 /**
@@ -132,7 +153,7 @@ function deleteResourceRoot(){
  * @return the number of affected rows
  */
 function deleteResourceElement($table, $element_key, $key_value){
-  // Load the database helper for querying
+  // Load the appropriate helpers
   $ci =& get_instance(); $ci->load->helper('database');
   return database_query(
     "DELETE FROM ".$table." WHERE ".$element_key."=?",

@@ -54,7 +54,7 @@ function database_query($query, $types, $params, $query_type = "SELECT"){
     case "UPDATE":
     case "DELETE":
       $result = mysqli_stmt_affected_rows($statement);
-      return array ("rows"=>$result);
+      return array("rows"=>$result);
       break;
     case "SELECT":
     default:
