@@ -1,12 +1,13 @@
 <?php
 class Api extends CI_Controller {
 
-  private $users;
+  private $users, $auth;
 
   public function __construct(){
     parent::__construct();
     $this->load->helper('database');
     $this->load->helper('jwt');
+    $this->load->helper('auth');
     $this->load->helper('rest_api');
     $this->users = array(
       "table" => "`users`",
@@ -15,41 +16,36 @@ class Api extends CI_Controller {
       "read_fields" => "`username`, `user_id` AS `id`",
       "read_key" => "`username`"
     );
+    $this->auth = array(
+      "table" => "`users`",
+      "fields" => "`username`, `user_id` AS `id`, `password`",
+      "username_field" => "`username`",
+      "password_field" => "`password`",
+      "id_field" => "`id`",
+      "service_name" => "pyramids.social",
+      "cookie_name" => "pyramids_social_token"
+    );
   }
 
   public function login(){
     header('Content-Type: application/json');
     if($this->input->method(true) != 'POST'){
       echo json_encode(array("message:"=>"Use the HTTP POST method to login to the system."));
-      retun;
+      return;
     }
-    else {
-      $login_fields = "`username`, `password`, `user_id` AS `id`";
-      $data = readResourceElement(
-          $this->users["table"], $login_fields, $this->users["read_key"],
-          $_POST["username"]
-      );
-      if($data == false){
-        echo(json_encode(array('message'=>'No user with this username.')));
+    else
+      if(check_jwt_cookie($this->auth["service_name"], $this->auth["cookie_name"])){
+        echo json_encode(regenerate_jwt_cookie($this->auth["service_name"], $this->auth["cookie_name"]));
         return;
       }
       else {
-        if(password_verify(hash("sha512", $_POST["password"], true), $data[0]["password"])){
-          $token = array(
-            "username" => $_POST["username"],
-            "id" => $data[0]["id"],
-            "iat" => date_timestamp_get(date_create()),
-            "iss" => "pyramids.social"
-          );
-          $config = parse_ini_file(__DIR__.'/../../config.ini');
-          echo jwt_encode($token, $config["secret"]);
-        }
-        else {
-          echo(json_encode(array('message'=>'Password does not match.')));
-          return;
-        }
+        echo json_encode(authorize($this->auth["table"], $this->auth["fields"],
+          $this->auth["username_field"], $this->auth["password_field"], $this->auth["id_field"],
+          $_POST["username"], hash("sha512", $_POST["password"], true),
+          $this->auth["service_name"], $this->auth["cookie_name"]
+        ));
+        return;
       }
-    }
   }
 
   /**
