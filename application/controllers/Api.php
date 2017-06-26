@@ -1,7 +1,4 @@
 <?php
-//require __DIR__.'/../../db.php';
-//require __DIR__.'/../../jwt.php';
-
 class Api extends CI_Controller {
 
   private $users;
