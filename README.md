@@ -3,7 +3,7 @@
 Simple RESTful API boilerplate for the CodeIgniter framework.
 </p>
 <p align="center">
-![Logo](/docs/logo.png)
+![Logo](docs/logo.png)
 </p>
 
 ## Requirements
