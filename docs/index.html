@@ -44,8 +44,251 @@
         <li>(Optional) Copy and paste the <code>.example.htaccess</code> file and tweak it to your liking. Remember to rename it to <code>.htaccess</code>.</li>
         <li>(Recommended) Enable HTTPS for your server for maximum security.</li>
       </ol>
-			<h3 style="margin: 2rem 0.5rem 1.25rem;">Introduction</h3>
-      <p style="text-align:justify"></p>
+      <h3 id="contents" style="margin: 2rem 0.5rem 1.25rem;">Contents</h3>
+      <p style="text-align:justify">The API is made up of a set of helpers, each one serving a different purpose. Click on each helper below to read about its functionality.</p>
+      <div class="button-group">
+        <a href="#error-code" class="button">error_code</a>
+        <a href="#request" class="button">request</a>
+        <a href="#database" class="button">database</a>
+        <a href="#jwt" class="button">jwt</a>
+        <a href="#auth" class="button">auth</a>
+        <a href="#rest-api" class="button">rest_api</a>
+      </div><br/>
+      <h4 id="error_code">error_code</h4>
+      <p style="text-align:justify">Contains values for various error codes. The codes are mostly matched to HTTP status codes, but some of them might not be perfect matches. The error codes are stored as global variables.</p>
+      <table class="preset">
+      <thead>
+      <tr>
+      <th>Variable</th>
+      <th style="text-align:center">Value</th>
+      <th>Description</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>PROHIBITED</td>
+      <td style="text-align:center">405</td>
+      <td>The action is not allowed.</td>
+      </tr>
+      <tr>
+      <td>BAD_DATA</td>
+      <td style="text-align:center">400</td>
+      <td>The data is malfored or does not match expected input.</td>
+      </tr>
+      <tr>
+      <td>BAD_CREDENTIALS</td>
+      <td style="text-align:center">403</td>
+      <td>The credentials provided cannot be successfully authorized.</td>
+      </tr>
+      <tr>
+      <td>UNAUTHORIZED</td>
+      <td style="text-align:center">403</td>
+      <td>The user has not the proper authorization to perform this action.</td>
+      </tr>
+      <tr>
+      <td>NO_COOKIE</td>
+      <td style="text-align:center">409</td>
+      <td>The expected cookie was not found.</td>
+      </tr>
+      <tr>
+      <td>SUCCESS</td>
+      <td style="text-align:center">200</td>
+      <td>The action was successful.</td>
+      </tr>
+      </tbody>
+      </table>
+      <br/>
+      <h4 id="request">request</h4>
+      <p style="text-align:justify">Contains a single method for retrieving the body of the current request.</p>
+      <ul style="text-align:justify">
+      <li><code>get_request_body()</code>: Retrieves the body of the current request.<ul>
+      <li><strong>returns</strong> the body of the current request</li>
+      </ul></li></ul><br/>
+      <h4 id="database">database</h4>
+      <p style="text-align:justify">Contains multiple methods for connecting and retrieving information from the database.</p>
+      <ul style="text-align:justify"><li><code>database_connect()</code>: Establishes a connection to the database. The connection&#39;s parameters (host, username, password and database name) are parsed from the <code>config.ini</code> file, residing in the CodeIgniter root folder.<ul>
+      <li><strong>returns</strong> a connection to the database</li>
+      </ul>
+      </li>
+      <li><code>database_query($query, $types, $params, $query_type)</code>: Uses a prepared statement to query the database, returning an associative array or false, based on the query&#39;s results.<ul>
+      <li><code>$query</code>: The query to the database, as a string.</li>
+      <li><code>$types</code>: A string that contains one or more characters which specify the types for the corresponding bind variables.</li>
+      <li><code>$params</code>: An array of values that will be passed as parameters to the query. The types of the parameters must match the types specified by <code>$types</code>.</li>
+      <li><code>$query_type</code>: (Optional) The type of query that will be executed (&quot;SELECT&quot; (default), &quot;INSERT&quot;, &quot;UPDATE&quot;, &quot;DELETE&quot;). The execution of the prepared statement will return different kinds of results based on the type specified.</li>
+      <li><strong>returns</strong> an associative array or false</li>
+      </ul>
+      </li>
+      <li><code>database_no_args_query($query)</code>:<ul>
+      <li>Queries the database, returning an associative array or false, based on the query&#39;s results. The query must have no arguments (e.g. useful for retrieving all values from a table).</li>
+      <li><code>$query</code>: The query to the database, as a string.</li>
+      <li><strong>returns</strong> an associative array or false</li>
+      </ul>
+      </li>
+      <li><code>database_error()</code>: Returns the last connection error, if any.<ul>
+      <li><strong>returns</strong> error description</li>
+      </ul>
+      </li>
+      </ul><br/>
+      <h4 id="jwt">jwt</h4>
+      <p style="text-align:justify">Heavily based on <a href="https://github.com/rmcdaniel/angular-codeigniter-seed/blob/master/api/application/helpers/jwt_helper.php">this implementation</a>, the JWT helper allows for the creation of <a href="https://jwt.io/">JSON Web Tokens</a>. The secret key provided in <code>config.ini</code> will be used to sign the token.</p>
+      <ul style="text-align:justify"><li><code>jwt_encode($payload, $key, $algo)</code>: Creates a JWT string.<ul>
+      <li><code>$payload</code>: The payload of the JSON Web Token.</li>
+      <li><code>$key</code>: The secret key</li>
+      <li><code>$algo</code>: (Optional) The signing algorithm (&#39;HS256&#39; (default), &#39;HS384&#39; or &#39;HS512&#39;).</li>
+      <li><strong>returns</strong> a signed JWT</li>
+      </ul>
+      </li>
+      <li><code>jwt_decode($jwt, $key, $verify)</code>:  Decodes a JWT string.<ul>
+      <li><code>$jwt</code>: The JSON Web Token.</li>
+      <li><code>$key</code>: The secret key.</li>
+      <li><code>$verify</code>: (Optional) Toggles verification of token on/off.</li>
+      <li><strong>returns</strong> the payload of the JWT</li>
+      </ul>
+      </li>
+      <li><code>sign($msg, $key, $method)</code>:  Signs a string with a given key and algorithm.<ul>
+      <li><code>$msg</code>: The message to sign.</li>
+      <li><code>$key</code>: The secret key.</li>
+      <li><code>$algo</code>: (Optional) The signing algorithm (&#39;HS256&#39; (default), &#39;HS384&#39; or &#39;HS512&#39;).</li>
+      <li><strong>returns</strong> encrypted message</li>
+      </ul>
+      </li>
+      <li><code>json_e_encode($input)</code>: Encodes into a JSON string (with error handling).<ul>
+      <li><code>$input</code>: Object to be encoded.</li>
+      <li><strong>returns</strong> the JSON representation of the object</li>
+      </ul>
+      </li>
+      <li><code>json_e_decode($input)</code>: Decodes a JSON string (with error handling).)<ul>
+      <li><code>$input</code>: JSON string to be decoded.</li>
+      <li><strong>returns</strong> the object representation of the JSON string</li>
+      </ul>
+      </li>
+      <li><code>urlsafe_base64_encode($input)</code>: Encodes a string with URL-safe Base64.<ul>
+      <li><code>$input</code>: A string to be encoded.</li>
+      <li><strong>returns</strong> the Base64 encoded string</li>
+      </ul>
+      </li>
+      <li><code>urlsafe_base64_decode($input)</code>: Decodes a string with URL-safe Base64.<ul>
+      <li><code>$input</code>: A Base64 string to be decoded.</li>
+      <li><strong>returns</strong> a decoded string</li>
+      </ul>
+      </li>
+      </ul><br/>
+      <h4 id="auth">auth</h4>
+      <p style="text-align:justify">Contains multiple methods used for authorization, authorization validation and usage with JSON Web Tokens in cookies.</p>
+      <ul style="text-align:justify">
+      <li><code>authorize($table, $fields, $username_field, $password_field, $id_field, $username_value, $password_value, $service_name, $cookie_name)</code>: Provides authorized access to the system for a user, based on the provided credentials, using a query to the database. If the authorization is successful, a unique JSON Web Token is generated and stored in a cookie.<ul>
+      <li><code>$table</code>: The database table to query.</li>
+      <li><code>$fields</code>: An array of names for the fields to be requested.</li>
+      <li><code>$username_field</code>: The name of the username field.</li>
+      <li><code>$password_field</code>: The name of the password field.</li>
+      <li><code>$id_field</code>: The name of the id field.</li>
+      <li><code>$username_value</code>: The value of the username field.</li>
+      <li><code>$password_value</code>: The value of the password field.</li>
+      <li><code>$service_name</code>: The name of the service.</li>
+      <li><code>$cookie_name</code>: The name of the cookie used to store the authorization token.</li>
+      <li><strong>returns</strong> an associative array</li>
+      </ul>
+      </li>
+      <li><code>generate_jwt_cookie($username_value, $id_value, $service_name, $cookie_name)</code>: Generates a unique JSON Web Token from the values provided.<ul>
+      <li><code>$username_value</code>: The user&#39;s unique username.</li>
+      <li><code>$id_value</code>: The user&#39;s unique id.</li>
+      <li><code>$service_name</code>: The name of the service.</li>
+      <li><code>$cookie_name</code>: The name of the cookie used to store the authorization token.</li>
+      <li><strong>returns</strong> void</li>
+      </ul>
+      </li>
+      <li><code>regenerate_jwt_cookie($service_name, $cookie_name)</code>: Regenerates a unique JSON Web Token from the values provided. Will return a message if no existing cookie is found.<ul>
+      <li><code>$service_name</code>: The name of the service.</li>
+      <li><code>$cookie_name</code>: The name of the cookie used to store the authorization token.</li>
+      <li><strong>returns</strong> an associative array</li>
+      </ul>
+      </li>
+      <li><code>check_jwt_cookie($service_name, $cookie_name)</code>: Checks the validity of a unique JSON Web Token.<ul>
+      <li><code>$service_name</code>: The name of the service.</li>
+      <li><code>$cookie_name</code>: The name of the cookie used to store the authorization token.</li>
+      <li><strong>returns</strong> true if the cookie is found and the JWT is valid, false otherwise</li>
+      </ul>
+      </li>
+      <li><code>get_jwt_data($cookie_name)</code>: Gets the data stored in a unique JSON Web Token.<ul>
+      <li><code>$cookie_name</code>: The name of the cookie used to store the authorization token.</li>
+      <li><strong>returns</strong> an associative array</li>
+      </ul>
+      </li>
+      </ul><br/>
+      <h4 id="rest-api">rest-api</h4>
+      <p style="text-align:justify">Contains multiple methods, implementing generic CRUD methods for a RESTful API. For security reasons, certain methods are not implemented, but rather return an associative array with an error code and a message.</p>
+      <ul style="text-align:justify">
+      <li><code>createResourceRoot()</code>: Creates a new collection, using a query to the database.<ul>
+      <li><strong>returns</strong> an associative array with an error message</li>
+      </ul>
+      </li>
+      <li><code>createResourceElement($table, $input_fields, $input_types, $input_values)</code>: Creates a new entry in a collection, using a query to the database.<ul>
+      <li><code>$table</code>: The database table to query.</li>
+      <li><code>$input_fields</code>: An array of names for the fields to be filled.</li>
+      <li><code>$input_types</code>: A string that contains one or more characters</li>
+      <li>which specify the types for the corresponding fields.</li>
+      <li><code>$input_values</code>: An array of values for the fields to be filled.</li>
+      <li><strong>returns</strong> the id of the newly-created collection member</li>
+      </ul>
+      </li>
+      <li><code>readResourceRoot($table, $fields)</code>: Lists the members of a collection, using a query to the database.<ul>
+      <li><code>$table</code>: The database table to query.</li>
+      <li><code>$fields</code>: The table&#39;s fields to be retrieved.</li>
+      <li><strong>returns</strong> a collection of elements</li>
+      </ul>
+      </li>
+      <li><code>readResourceElement($table, $fields, $element_key, $key_value)</code>: Retrieves a specific member of a collection, using a query to the database.<ul>
+      <li><code>$table</code>: The database table to query.</li>
+      <li><code>$fields</code>: The table&#39;s fields to be retrieved.</li>
+      <li><code>$element_key</code>: The table&#39;s field that will be used for the specific</li>
+      <li>resource&#39;s indentification.</li>
+      <li><code>$key_value</code>: The value to be used for the specific resource&#39;s</li>
+      <li>identification.</li>
+      <li><strong>returns</strong> a list of members or false</li>
+      </ul>
+      </li>
+      <li><code>updateResourceRoot()</code>: Updates a resource collection, using a query to the database.<ul>
+      <li><strong>returns</strong> an associative array with an error message</li>
+      </ul>
+      </li>
+      <li><code>updateResourceElement($table, $input_fields, $input_types, $input_values, $element_key, $key_value)</code>: Updates a specific member of a collection, using a query to the database.<ul>
+      <li><code>$table</code>: The database table to query.</li>
+      <li><code>$input_fields</code>: An array of names for the fields to be updated.</li>
+      <li><code>$input_types</code>: A string that contains one or more characters</li>
+      <li>which specify the types for the corresponding fields.</li>
+      <li><code>$input_values</code>: An array of values for the fields to be updated.</li>
+      <li><code>$element_key</code>: The table&#39;s field that will be used for the specific</li>
+      <li>resource&#39;s indentification.</li>
+      <li><code>$key_value</code>: The value to be used for the specific resource&#39;s</li>
+      <li>identification.</li>
+      <li><strong>returns</strong> the number of affected rows</li>
+      </ul>
+      </li>
+      <li><code>deleteResourceRoot()</code>: Deletes a resource collection, using a query to the database.<ul>
+      <li><strong>returns</strong> an associative array with an error message</li>
+      </ul>
+      </li>
+      <li><code>deleteResourceElement($table, $element_key, $key_value)</code>: Deletes a specific member of a collection, using a query to the database.<ul>
+      <li><code>$table</code>: The database table to query.</li>
+      <li><code>$element_key</code>: The table&#39;s field that will be used for the specific</li>
+      <li>resource&#39;s indentification.</li>
+      <li><code>$key_value</code>: The value to be used for the specific resource&#39;s</li>
+      <li>identification.</li>
+      <li><strong>returns</strong> the number of affected rows</li>
+      </ul>
+      </li>
+      </ul>
+      <h3 id="how-to-use" style="margin: 2rem 0.5rem 1.25rem;">How to use</h3>
+      <p style="text-align:justify;">The provided helpers are supposed to be used in a <code>CI_Controller</code>, but you can use them any way you like. The sample provided (<strong>controllers/Api.php</strong>) is a pretty good starting point for a RESTful API implementation:</p><br/>
+      <ul style="text-align:justify;">
+      <li>All helpers are loaded in the <code>__construct()</code> method of the <code>Api</code> class. Certain variables are also instantiated to be used for the API&#39;s requests.</li>
+      <li>The <code>index()</code> method is an empty method returning an error message, when no resource is specified in the request in the form of a URI.</li>
+      <li>The <code>users($param)</code> method maps the different API methods to HTTP methods (CREATE = POST, READ = GET, UPDATE = PUT, DELETE = DELETE) and uses the various helpers and class variables to provide a sample RESTful API implementation.</li>
+      <li>The <code>login($param)</code> method allows for the authorization of a user (needed to update or delete a resource matched to his/her username).</li>
+    </ul><br/>
+      <p style="text-align:justify;">To query the API, you should use something like <code>example.com/index.php/api/resource_name</code> (or <code>example.com/api/resource_name</code>, if you are using the <code>.htaccess</code> file provided, configured to your environment), replacing <code>resource_name</code> with your resource&#39;s name (e.g. <code>users</code>). Bear in mind that certain requests will return errors due to implementation specifics. All responses are encoded as JSON for easier use with frontend frameworks.</p>
+      <h3 id="license" style="margin: 2rem 0.5rem 1.25rem;">License</h3>
+      <p style="text-align:justify;">The project is licensed under the MIT license.</p>
     </div>
   </div>
 </div>

@@ -1,4 +1,9 @@
 <?php
+/**
+ * This is a sample implementation of a RESTful API. The database contains a
+ * `users` table with four columns (`user_id`, `username`, `password` and
+ * `email`).
+ */
 class Api extends CI_Controller {
 
   private $users, $auth;
@@ -130,7 +135,10 @@ class Api extends CI_Controller {
         $param
       );
       if($data == false)
-        echo(json_encode(array('message'=>'No user with this username.')));
+        echo json_encode(array(
+          "code" => BAD_DATA,
+          "message" => "No user with this username."
+        ));
       else
         echo json_encode($data[0]);
     }
@@ -142,7 +150,10 @@ class Api extends CI_Controller {
    */
   public function index(){
     header('Content-Type: application/json');
-    echo(json_encode(array('message'=>'No resource specified.')));
+    echo json_encode(array(
+      "code" => BAD_DATA,
+      "message"=>"No resource specified."
+  ));
   }
 }
 ?>

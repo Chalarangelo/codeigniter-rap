@@ -6,7 +6,6 @@
 define("PROHIBITED", 405);
 define("BAD_DATA", 400);
 define("BAD_CREDENTIALS", 403);
-// $BAD_CREDENTIALS = 403;
 define("UNAUTHORIZED", 403);
 define("NO_COOKIE", 409);
 define("SUCCESS", 200);
