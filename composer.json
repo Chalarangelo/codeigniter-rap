@@ -1,23 +1,20 @@
 {
-	"description": "The CodeIgniter framework",
-	"name": "codeigniter/framework",
+	"description": "Simple RESTful API boilerplate for the CodeIgniter framework",
+	"name": "chalarangelo/codeigniter-rap",
 	"type": "project",
-	"homepage": "https://codeigniter.com",
+	"homepage": "https://chalarangelo.github.io/codeigniter-rap.css/",
 	"license": "MIT",
-	"support": {
-		"forum": "http://forum.codeigniter.com/",
-		"wiki": "https://github.com/bcit-ci/CodeIgniter/wiki",
-		"irc": "irc://irc.freenode.net/codeigniter",
-		"source": "https://github.com/bcit-ci/CodeIgniter"
-	},
 	"require": {
 		"php": ">=5.3.7"
 	},
-	"suggest": {
-		"paragonie/random_compat": "Provides better randomness in PHP 5.x"
-	},
-	"require-dev": {
-		"mikey179/vfsStream": "1.1.*",
-		"phpunit/phpunit": "4.* || 5.*"
-	}
+	"authors": [
+    {
+      "name": "Angelos Chalaris",
+      "role": "Developer",
+      "email": "chalarangelo@gmail.com"
+    }
+  ],
+  "support": {
+    "source": "https://github.com/Chalarangelo/codeigniter-rap"
+  }
 }
