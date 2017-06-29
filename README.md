@@ -1,10 +1,13 @@
-<h1 align="center">CodeIgniter RAP</h1>
-<p align="center">
+# CodeIgniter RAP
 Simple RESTful API boilerplate for the CodeIgniter framework.
-</p>
-<p align="center">
-<img src="/docs/logo.png"/>
-</p>
+
+```
+composer create-project chalarangelo/codeigniter-rap
+```
+
+## Introduction
+
+The **CodeIgniter RESTful API** is a set of simple, modular helpers that can be easily integrated into your CodeIgniter projects, allowing you to create customizable RESTful APIs that suit all your needs. The package includes helpers for database manipulation, JSON Web Token generation, validation and signing, authentication methods, methods for accessing resources using a URI, as well as some utility methods that will help streamline your workflow.
 
 ## Requirements
 
